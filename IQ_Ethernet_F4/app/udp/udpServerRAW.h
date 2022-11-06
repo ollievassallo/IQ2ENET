@@ -22,6 +22,8 @@
 #ifndef INC_UDPSERVERRAW_H_
 #define INC_UDPSERVERRAW_H_
 
+#include "udp.h"
+#include "app.h"
 
 void udpServer_init(void);
 

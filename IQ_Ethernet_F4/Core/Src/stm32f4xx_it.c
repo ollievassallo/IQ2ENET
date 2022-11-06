@@ -58,7 +58,7 @@
 /* External variables --------------------------------------------------------*/
 
 /* USER CODE BEGIN EV */
-
+extern uint8_t flag_1ms;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -188,7 +188,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+  flag_1ms = 1;
   /* USER CODE END SysTick_IRQn 1 */
 }
 

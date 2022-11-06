@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "udpServerRAW.h"
+#include "app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,7 +55,7 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-extern struct netif gnetif;
+
 /* USER CODE END 0 */
 
 /**
@@ -88,7 +88,8 @@ int main(void)
   MX_GPIO_Init();
   MX_LWIP_Init();
   /* USER CODE BEGIN 2 */
-  udpServer_init();
+  App_Init();
+  App_Runtime();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -98,8 +99,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  ethernetif_input(&gnetif);
-	  sys_check_timeouts();
+
   }
   /* USER CODE END 3 */
 }
