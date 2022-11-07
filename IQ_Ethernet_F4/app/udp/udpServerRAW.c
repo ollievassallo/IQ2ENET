@@ -98,6 +98,7 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
 	{
 		flag_reg = IQ_CMD_Reset;
 	}
+	pbuf_free(p);
 
 	/* Get the IP of the Client */
 //	char *remoteIP 	= ipaddr_ntoa(&(upcb->remote_ip));
