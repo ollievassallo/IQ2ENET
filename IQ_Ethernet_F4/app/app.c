@@ -20,15 +20,11 @@ struct pbuf *txBuf;
 
 IQ_CTRL_State iq_ctrl_fsm_wait()
 {
-	if(flag_reg == 1)
+	if(flag_reg == IQ_CMD_Config)
 	{
 		// CONFIG was received
-
-		char *remoteIP 	= ipaddr_ntoa(&(upcb->remote_ip));
-		char *localIP 	= ipaddr_ntoa(&(upcb->local_ip));
-
 		char buf[100];
-		int len = sprintf (buf,"Remote Device -> \t %s:%04d \nLocal  Device -> \t %s:%04d ... Connected\n", remoteIP, upcb->remote_port, localIP, upcb->local_port);
+		int len = sprintf (buf,"[ STATE - Idle ] Waiting for Client's Start Command \n");
 
 		txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
 		pbuf_take(txBuf, buf, len);
@@ -51,7 +47,7 @@ IQ_CTRL_State iq_ctrl_fsm_idle()
 	if(flag_reg == IQ_CMD_Start)
 	{
 		char buf[100];
-		int len = sprintf (buf,"Start data Logging\n");
+		int len = sprintf (buf,"[ STATE - Logging ] Data-Logging Procedure ... Started\n");
 
 		txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
 		pbuf_take(txBuf, buf, len);
@@ -63,11 +59,8 @@ IQ_CTRL_State iq_ctrl_fsm_idle()
 	}
 	else if(flag_reg == IQ_CMD_Reset)
 	{
-		char *remoteIP 	= ipaddr_ntoa(&(upcb->remote_ip));
-		char *localIP 	= ipaddr_ntoa(&(upcb->local_ip));
-
 		char buf[100];
-		int len = sprintf (buf,"Remote Device -> \t %s:%04d \nLocal  Device -> \t %s:%04d ... Disconnected\n", remoteIP, upcb->remote_port, localIP, upcb->local_port);
+		int len = sprintf (buf,"[ STATE - Waiting ] Client Disconnected\n");
 
 		txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
 		pbuf_take(txBuf, buf, len);
@@ -89,9 +82,8 @@ IQ_CTRL_State iq_ctrl_fsm_log()
 	static uint16_t tx_counter = 0;
 	if(flag_reg == IQ_CMD_Stop)
 	{
-		char *remoteIP 	= ipaddr_ntoa(&(upcb->remote_ip));
 		char buf[100];
-		int len = sprintf (buf,"Logging Stopped by %s:%04d after %d Transmit cycle(s)\n", remoteIP, upcb->remote_port, tx_counter);
+		int len = sprintf (buf,"[ STATE - Idle ] Data-Logging Procedure Stopped ... Stopped\n");
 
 		txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
 		pbuf_take(txBuf, buf, len);

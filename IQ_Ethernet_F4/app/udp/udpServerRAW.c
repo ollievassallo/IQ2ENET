@@ -76,7 +76,7 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
 {
 //	struct pbuf *txBuf;
 
-	// Set the IP Address and Port to the ones currenlty in use
+	// Set the IP Address and Port to the ones currently in use
 	upcb->remote_ip.addr = addr->addr;
 	upcb->remote_port = port;
 	strncpy(payload_buffer, (char *)p->payload, p->len);
