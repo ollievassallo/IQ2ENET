@@ -7,6 +7,7 @@
 
 #include "app.h"
 
+#define PAYLOAD_SIZE 1024
 
 uint8_t flag_1ms = 0;
 uint8_t flag_1s = 0;
@@ -15,7 +16,7 @@ extern IQ_CMD_Type		 flag_reg;
 extern char 		 	 payload_buffer[100];
 extern struct netif 	 gnetif;
 
-
+uint8_t logging_buffer[PAYLOAD_SIZE] = {0};
 struct pbuf *txBuf;
 
 IQ_CTRL_State iq_ctrl_fsm_wait()
@@ -33,7 +34,7 @@ IQ_CTRL_State iq_ctrl_fsm_wait()
 		udp_send(upcb, txBuf);
 		pbuf_free(txBuf);
 
-
+		HAL_GPIO_WritePin(LED_BLUE, GPIO_PIN_SET);
 		return IQ_CTRL_FSM_Idle;
 	}
 	else
@@ -55,6 +56,11 @@ IQ_CTRL_State iq_ctrl_fsm_idle()
 		udp_send(upcb, txBuf);
 		pbuf_free(txBuf);
 
+
+		txBuf = pbuf_alloc(PBUF_TRANSPORT, 5, PBUF_RAM);
+
+		HAL_GPIO_WritePin(LED_RED, GPIO_PIN_SET);
+
 		return IQ_CTRL_FSM_Log;
 	}
 	else if(flag_reg == IQ_CMD_Reset)
@@ -68,6 +74,8 @@ IQ_CTRL_State iq_ctrl_fsm_idle()
 		pbuf_free(txBuf);
 
 		udp_disconnect(upcb);
+
+		HAL_GPIO_WritePin(LED_BLUE, GPIO_PIN_RESET);
 		return IQ_CTRL_FSM_Wait;
 	}
 	else
@@ -82,6 +90,8 @@ IQ_CTRL_State iq_ctrl_fsm_log()
 	static uint16_t tx_counter = 0;
 	if(flag_reg == IQ_CMD_Stop)
 	{
+		pbuf_free(txBuf);
+
 		char buf[100];
 		int len = sprintf (buf,"[ STATE - Idle ] Data-Logging Procedure Stopped ... Stopped\n");
 
@@ -90,8 +100,10 @@ IQ_CTRL_State iq_ctrl_fsm_log()
 		udp_send(upcb, txBuf);
 		pbuf_free(txBuf);
 
-
 		tx_counter = 0;
+
+		HAL_GPIO_WritePin(LED_RED, GPIO_PIN_RESET);
+
 		return IQ_CTRL_FSM_Idle;
 	}
 	else
@@ -103,13 +115,15 @@ IQ_CTRL_State iq_ctrl_fsm_log()
 			{
 				tx_counter = 0;
 			}
-			char buf[100];
-			int len = sprintf (buf,"TX Counter: %4d\n", tx_counter);
+/*			char buf[100];
+			int len = sprintf (buf,"TX Counter: %4d\n", tx_counter);*/
 
-			txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
-			pbuf_take(txBuf, buf, len);
+			HAL_GPIO_WritePin(LED_GREEN, GPIO_PIN_SET);
+			txBuf = pbuf_alloc(PBUF_TRANSPORT, PAYLOAD_SIZE, PBUF_RAM);
+			pbuf_take(txBuf, logging_buffer, PAYLOAD_SIZE);
 			udp_send(upcb, txBuf);
 			pbuf_free(txBuf);
+			HAL_GPIO_WritePin(LED_GREEN, GPIO_PIN_RESET);
 
 		}
 		return IQ_CTRL_FSM_Log;
@@ -121,6 +135,11 @@ void App_Init()
 	udpServer_init();
 
 	//txBuf = pbuf_alloc(PBUF_TRANSPORT, 100, PBUF_RAM);
+
+	for(uint16_t i = 0; i < PAYLOAD_SIZE; i++)
+	{
+		logging_buffer[i] = i;
+	}
 }
 
 void App_Runtime()
@@ -138,7 +157,7 @@ void App_Runtime()
 		{
 			// Divide the Systick by 1000
 			flag_1ms = 0;
-			if(ms_counter++ == 1000)
+			if(ms_counter++ == 100)
 			{
 				ms_counter = 0;
 				flag_1s = 1;

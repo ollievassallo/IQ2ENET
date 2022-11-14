@@ -1,5 +1,6 @@
 from tkinter        import *
 from tkinter        import filedialog
+from tkinter        import messagebox
 from class_ui       import UI_Comms, UI_Flow,  UI_Logging
 from ping           import ping
 from class_iq_mcu   import IQ_MCU
@@ -47,7 +48,7 @@ def OpenComms(ui_comms, ui_flow, btn):
 def Flow_Prev(ui_comms, ui_flow):
     if(mcu.port_state == "Closed"):
         return
-    
+    print("Port State: "+str(mcu.port_state))
     if(mcu.current_state == "WAITING"):
         pass
     elif(mcu.current_state == "IDLE"):
@@ -62,12 +63,15 @@ def Flow_Prev(ui_comms, ui_flow):
 def Flow_Next(ui_comms, ui_flow):
     if(mcu.port_state == "Closed"):
         return
-    
+    print("Port State: "+str(mcu.port_state))
     if(mcu.current_state == "WAITING"):
         mcu.setState_Idle()
     elif(mcu.current_state == "IDLE"):
-        mcu.setState_Logging()
-        mcu.rx_start()
+        if(mcu.filepath == ""):
+            messagebox.showwarning("Missing Data", "No directory selected")
+        else:
+            mcu.setState_Logging()
+            mcu.rx_start()
     elif(mcu.current_state == "LOGGING"):
         pass
     else:
@@ -84,10 +88,9 @@ def Logging_OpenFolder(ui_comms, ui_flow, ui_logging):
     ui_logging.getPath().delete(0, END)
     ui_logging.getPath().insert(0, str(path))
 
-def Create_UI():
-    root = Tk()
-    root.title("IQ-Ethernet Terminal")
+    mcu.setFilePath(path)
 
+def Create_UI():
     ## ##########################################################################################
     ##
     ## Create Objects for all UI Elements except Buttons
@@ -95,9 +98,9 @@ def Create_UI():
     ## ##########################################################################################
     
     # Create the Different UI Sections
-    frame_comms = LabelFrame(root, text="Ethernet Settings")
-    frame_flow = LabelFrame(root, text="Logger System Flow Control")
-    frame_logging = LabelFrame(root, text="Logger System Flow Control")
+    frame_comms     = LabelFrame(root, text="Ethernet Settings")
+    frame_flow      = LabelFrame(root, text="Logger System Flow Control")
+    frame_logging   = LabelFrame(root, text="Logger System Save Location")
     
     # Ethernet Section
     label_ip_pc     = Label(frame_comms, width = 15, text = "PC IP Address")
@@ -182,6 +185,7 @@ def Create_UI():
 
     return {ui_comms, ui_flow, ui_logging}
 
-if __name__ == "__main__":
-    Create_UI()
-    
+
+root = Tk()
+root.title("IQ-Ethernet Terminal")
+Create_UI()
