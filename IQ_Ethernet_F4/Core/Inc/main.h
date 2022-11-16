@@ -64,14 +64,10 @@ void Error_Handler(void);
 #define LED_RED_GPIO_Port GPIOB
 #define LED_BLUE_Pin GPIO_PIN_7
 #define LED_BLUE_GPIO_Port GPIOB
-
+/* USER CODE BEGIN Private defines */
 #define LED_GREEN 	LED_GREEN_GPIO_Port, LED_GREEN_Pin
 #define LED_RED 	LED_RED_GPIO_Port, LED_RED_Pin
 #define LED_BLUE 	LED_BLUE_GPIO_Port, LED_BLUE_Pin
-
-
-/* USER CODE BEGIN Private defines */
-
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

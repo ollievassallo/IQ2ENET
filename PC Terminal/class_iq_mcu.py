@@ -59,7 +59,9 @@ class IQ_MCU:
     def openPort(self):
         if(self.port_state == "Closed"):
             self.port_state = "Open"
+            self.socket.settimeout(1)
             self.socket.connect( (self.addr) )
+            self.rx_start()
         return "PORT OPENED"
 
     def closePort(self):
@@ -68,6 +70,7 @@ class IQ_MCU:
             if(cmd_state == "SUCCESS"):
                 self.socket.close()
                 self.port_state = "Closed"
+                self.rx_stop()
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             else:
                 return "FAILED TO CLOSE\n\t"+str(cmd_state)
@@ -83,6 +86,8 @@ class IQ_MCU:
         self.current_state = "LOGGING"        
 
     def cmd_send_stop(self):
+        # Perform a dummy read to make sure all the data is received
+        data = self.socket.recv(BUFFER_SIZE)
         self.__cmd_send("STOP", "STATE - Idle")
         self.current_state = "IDLE"
 
@@ -170,31 +175,35 @@ class IQ_MCU:
     def receive_data(self, event):
         # Keep Waiting for new data until a stop is triggered by the Event() Object
         while self.event.is_set() == False:
-            # Wait for new data to come
-            data = self.socket.recv(BUFFER_SIZE)
+            if(self.current_state == "LOGGING"):
+                # Wait for new data to come
+                data = self.socket.recv(BUFFER_SIZE)
 
-            # Get the Current Time to Update Filename
-            t = time.localtime(time.time())
-            subfolder = f"{t.tm_year:04d}.{t.tm_mon:02d}.{t.tm_mday:02d}//"
-            if(t.tm_mday != self.current_date):
-                self.current_date = t.tm_mday
-                path_to_check = os.path.isdir(self.filepath + subfolder)
-                if not(path_to_check):
-                    os.makedirs(self.filepath + subfolder)
+        
+                ## HANDLE WHEN DATA IS BEING LOGGED
+                # Get the Current Time to Update Filename
+                t = time.localtime(time.time())
+                subfolder = f"{t.tm_year:04d}.{t.tm_mon:02d}.{t.tm_mday:02d}//"
+                if(t.tm_mday != self.current_date):
+                    self.current_date = t.tm_mday
+                    path_to_check = os.path.isdir(self.filepath + subfolder)
+                    if not(path_to_check):
+                        os.makedirs(self.filepath + subfolder)
+                    
+                if(t.tm_min != self.current_min):
+                    self.current_min = t.tm_min
+
+                filename = self.filepath + subfolder + f"{t.tm_hour:02d}.{t.tm_min:02d}" + ".bin"
                 
-            if(t.tm_min != self.current_min):
-                self.current_min = t.tm_min
+                # Convert the Values to an Integer list
+                int_list = [int(i) for i in data]
+                
+                # Write the data into a file, with a new line for each received UDP Datagram
+                with open(filename, "a") as bin_file:
+                    bin_file.write(str(int_list))
+                    bin_file.write("\n")
 
-            filename = self.filepath + subfolder + f"{t.tm_hour:02d}.{t.tm_min:02d}" + ".bin"
-            
-            # Convert the Values to an Integer list
-            int_list = [int(i) for i in data]
-            
-            # Write the data into a file, with a new line for each received UDP Datagram
-            with open(filename, "a") as bin_file:
-                bin_file.write(str(int_list))
-                bin_file.write("\n")
-
+        
 SERVER  = "192.168.1.195"
 PORT    = 7
 if __name__ == "__main__":

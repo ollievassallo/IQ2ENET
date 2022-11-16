@@ -17,6 +17,13 @@ extern char 		 	 payload_buffer[100];
 extern struct netif 	 gnetif;
 
 uint8_t logging_buffer[PAYLOAD_SIZE] = {0};
+
+uint8_t* pData_I0 = &logging_buffer[0*(1024 >> 2)];
+uint8_t* pData_I1 = &logging_buffer[1*(1024 >> 2)];
+uint8_t* pData_Q0 = &logging_buffer[2*(1024 >> 2)];
+uint8_t* pData_Q1 = &logging_buffer[3*(1024 >> 2)];
+
+
 struct pbuf *txBuf;
 
 IQ_CTRL_State iq_ctrl_fsm_wait()
@@ -132,6 +139,18 @@ IQ_CTRL_State iq_ctrl_fsm_log()
 
 void App_Init()
 {
+	/*
+	 * Configure SPI DMAs
+	 */
+	// Channel I-0
+	SPI1->CR2 |= SPI_CR2_RXDMAEN;
+
+	// Channel I-1
+
+	// Channel Q-0
+
+	// Channel Q-1
+
 	udpServer_init();
 
 	//txBuf = pbuf_alloc(PBUF_TRANSPORT, 100, PBUF_RAM);
@@ -157,7 +176,7 @@ void App_Runtime()
 		{
 			// Divide the Systick by 1000
 			flag_1ms = 0;
-			if(ms_counter++ == 100)
+			if(ms_counter++ == 10)
 			{
 				ms_counter = 0;
 				flag_1s = 1;
