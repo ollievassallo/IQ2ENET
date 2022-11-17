@@ -58,7 +58,7 @@
 /* External variables --------------------------------------------------------*/
 
 /* USER CODE BEGIN EV */
-
+extern uint8_t flag_1ms;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -184,9 +184,9 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-
+	flag_1ms = 0;
   /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
+	HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
