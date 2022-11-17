@@ -18,10 +18,10 @@ extern struct netif 	 gnetif;
 
 uint8_t logging_buffer[PAYLOAD_SIZE] = {0};
 
-uint8_t* pData_I0 = &logging_buffer[0*(1024 >> 2)];
-uint8_t* pData_I1 = &logging_buffer[1*(1024 >> 2)];
-uint8_t* pData_Q0 = &logging_buffer[2*(1024 >> 2)];
-uint8_t* pData_Q1 = &logging_buffer[3*(1024 >> 2)];
+uint8_t* pData_I0 = &logging_buffer[0*(PAYLOAD_SIZE >> 2)];
+uint8_t* pData_I1 = &logging_buffer[1*(PAYLOAD_SIZE >> 2)];
+uint8_t* pData_Q0 = &logging_buffer[2*(PAYLOAD_SIZE >> 2)];
+uint8_t* pData_Q1 = &logging_buffer[3*(PAYLOAD_SIZE >> 2)];
 
 
 struct pbuf *txBuf;
