@@ -28,6 +28,11 @@ typedef enum
 	IQ_CTRL_FSM_Log			// MCU Starts logging data to PC
 }IQ_CTRL_State;
 
+typedef struct
+{
+
+};
+
 #define LED_GREEN 	LD1_GPIO_Port, LD1_Pin
 #define LED_YELLOW 	LD2_GPIO_Port, LD2_Pin
 #define LED_RED 	LD3_GPIO_Port, LD3_Pin

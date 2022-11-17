@@ -9,20 +9,19 @@
 
 #define PAYLOAD_SIZE 1024
 
-uint8_t flag_1ms = 0;
-uint8_t flag_1s = 0;
+uint8_t flag_1ms 	= 0;
+uint8_t flag_1s 	= 0;
 extern struct udp_pcb 	*upcb;
 extern IQ_CMD_Type		 flag_reg;
 extern char 		 	 payload_buffer[100];
 extern struct netif 	 gnetif;
 
-uint8_t logging_buffer[PAYLOAD_SIZE] = {0};
-
+uint8_t  dma_flag = 0;
+uint8_t  logging_buffer[PAYLOAD_SIZE] = {0};
 uint8_t* pData_I0 = &logging_buffer[0*(PAYLOAD_SIZE >> 2)];
 uint8_t* pData_I1 = &logging_buffer[1*(PAYLOAD_SIZE >> 2)];
 uint8_t* pData_Q0 = &logging_buffer[2*(PAYLOAD_SIZE >> 2)];
 uint8_t* pData_Q1 = &logging_buffer[3*(PAYLOAD_SIZE >> 2)];
-
 
 struct pbuf *txBuf;
 
@@ -118,10 +117,6 @@ IQ_CTRL_State iq_ctrl_fsm_log()
 		if(flag_1s)
 		{
 			flag_1s = 0;
-			if(++tx_counter > 9999)
-			{
-				tx_counter = 0;
-			}
 /*			char buf[100];
 			int len = sprintf (buf,"TX Counter: %4d\n", tx_counter);*/
 
@@ -144,26 +139,22 @@ void App_Init()
 	 */
 	// Channel I-0
 
+
 	// Channel I-1
 
 	// Channel Q-0
 
 	// Channel Q-1
 
+
 	udpServer_init();
 
 	//txBuf = pbuf_alloc(PBUF_TRANSPORT, 100, PBUF_RAM);
-
-	for(uint16_t i = 0; i < PAYLOAD_SIZE; i++)
-	{
-		logging_buffer[i] = i;
-	}
 }
 
 void App_Runtime()
 {
 	IQ_CTRL_State fsm_state = IQ_CTRL_FSM_Wait;
-
 	uint16_t ms_counter = 0;
 
 	while(1)
