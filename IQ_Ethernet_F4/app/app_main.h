@@ -5,13 +5,17 @@
  *      Author: Oliver Vassallo
  */
 
-#ifndef APP_H_
-#define APP_H_
+#ifndef APP_MAIN_H_
+#define APP_MAIN_H_
 
 #include <string.h>
 
 #include "lwip.h"
 #include "udpServerRAW.h"
+#include "iq_memory.h"
+
+
+#define DATA_SOURCE_SPI
 
 typedef enum
 {
@@ -31,4 +35,4 @@ typedef enum
 void App_Init();
 void App_Runtime();
 
-#endif /* APP_H_ */
+#endif /* APP_MAIN_H_ */
