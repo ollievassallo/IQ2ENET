@@ -45,7 +45,9 @@ void IQ_Hardware_Init(IQ_Hardware_TypeDef* hw, uint8_t* process, uint8_t* tx)
 	hw->dma->NDTR = MEM_DMA_SIZE;
 	hw->dma->M0AR = (uint32_t)process;
 	hw->dma->M1AR = (uint32_t)tx;
-	hw->dma->PAR  = hw->spi->DR;
+	hw->dma->PAR  = (uint32_t)(&(hw->spi->DR));
+
+	hw->spi->CR2 |= SPI_CR2_RXDMAEN;
 
 	NVIC_EnableIRQ(hw->irq);
 }

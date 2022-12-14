@@ -112,6 +112,7 @@ int main(void)
   HAL_UART_Transmit(&huart3, pData, 5, 100);
 
   App_Init();
+  //App_Testing();
   App_Runtime();
   /* USER CODE END 2 */
 

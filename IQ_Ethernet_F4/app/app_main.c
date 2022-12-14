@@ -267,3 +267,14 @@ void App_Runtime()
 	}
 }
 
+void App_Testing()
+{
+	IQ_SystemReset(&iq_data);
+	IQ_Hardware_SetState(&iq_data, IQ_STATE_ENABLE);
+
+	while(1)
+	{
+		if(iq_data.flag_process == 0b1111)
+			HAL_GPIO_TogglePin(LED_RED)
+	}
+}

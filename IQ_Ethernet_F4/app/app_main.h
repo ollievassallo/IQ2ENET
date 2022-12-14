@@ -35,4 +35,6 @@ typedef enum
 void App_Init();
 void App_Runtime();
 
+void App_Testing();
+
 #endif /* APP_MAIN_H_ */
