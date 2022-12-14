@@ -25,8 +25,6 @@ class IQ_MCU:
             while True:
                 # Wait for reply back
                 data = self.socket.recv(BUFFER_SIZE)
-                print(data)
-
                 # Make sure reply is as expected
                 data = data.decode(self.BYTE_FORMAT)
                 data = data[data.find("[")+2:data.find("]")-1]
@@ -45,7 +43,7 @@ class IQ_MCU:
         self.socket         = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.addr           = (self.ip, self.port)
         self.event          = Event()
-        self.rx_thread      = Thread(target = self.receive_data, args=[self.event])
+        self.rx_thread      = Thread(name='Receive Handler (Init)', target = self.receive_data)
         self.filepath       = ""
         
     def setAddr(self, ip, port):
@@ -59,7 +57,6 @@ class IQ_MCU:
     def openPort(self):
         if(self.port_state == "Closed"):
             self.port_state = "Open"
-            self.socket.settimeout(1)
             self.socket.connect( (self.addr) )
             self.rx_start()
         return "PORT OPENED"
@@ -155,7 +152,7 @@ class IQ_MCU:
     def rx_start(self):
         if(self.rx_thread.is_alive() == False):
             self.event      = Event()
-            self.rx_thread  = threading.Thread(target = self.receive_data, args=[self.event])
+            self.rx_thread  = threading.Thread(name='Receive Handler (Start)', target = self.receive_data)
             t = time.localtime(time.time())
             self.current_min    = t.tm_min
             
@@ -172,14 +169,12 @@ class IQ_MCU:
         else:
             return "THREAD STOP: Failed"
             
-    def receive_data(self, event):
+    def receive_data(self):
         # Keep Waiting for new data until a stop is triggered by the Event() Object
         while self.event.is_set() == False:
             if(self.current_state == "LOGGING"):
                 # Wait for new data to come
                 data = self.socket.recv(BUFFER_SIZE)
-
-        
                 ## HANDLE WHEN DATA IS BEING LOGGED
                 # Get the Current Time to Update Filename
                 t = time.localtime(time.time())

@@ -5,6 +5,8 @@ from class_ui       import UI_Comms, UI_Flow,  UI_Logging
 from ping           import ping
 from class_iq_mcu   import IQ_MCU
 
+import  yappi
+
 # Default Server and Port
 SERVER  = "192.168.1.195"   
 PORT    = 7
@@ -55,7 +57,15 @@ def Flow_Prev(ui_comms, ui_flow):
         mcu.setState_Waiting()
     elif(mcu.current_state == "LOGGING"):
         mcu.rx_stop()
+        yappi.stop()
         mcu.setState_Idle()
+
+        threads = yappi.get_thread_stats()
+        for thread in threads:
+            print(" ********************************************************************************************")
+            print("Function stats for (%s) (%d)" % (thread.name, thread.id) )  # it is the Thread.__class__.__name__
+            yappi.get_func_stats(ctx_id=thread.id).print_all()
+    
     else:
         print('Invalid')
     ui_flow.setState(mcu.current_state)
@@ -71,6 +81,7 @@ def Flow_Next(ui_comms, ui_flow):
             messagebox.showwarning("Missing Data", "No directory selected")
         else:
             mcu.setState_Logging()
+            yappi.start()
             mcu.rx_start()
     elif(mcu.current_state == "LOGGING"):
         pass
@@ -185,7 +196,9 @@ def Create_UI():
 
     return {ui_comms, ui_flow, ui_logging}
 
+yappi.set_clock_type("cpu")
 
 root = Tk()
 root.title("IQ-Ethernet Terminal")
 Create_UI()
+yappi.stop()

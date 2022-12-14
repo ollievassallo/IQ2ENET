@@ -275,6 +275,6 @@ void App_Testing()
 	while(1)
 	{
 		if(iq_data.flag_process == 0b1111)
-			HAL_GPIO_TogglePin(LED_RED)
+			HAL_GPIO_TogglePin(LED_RED);
 	}
 }
